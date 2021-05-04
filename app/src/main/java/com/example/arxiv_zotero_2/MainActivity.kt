@@ -1,5 +1,6 @@
 package com.example.arxiv_zotero_2
 
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
@@ -24,6 +25,19 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        ///////////// Check if Zotero key is good. Otherwise need to get new API keys
+        var zoteroKeyFile = cacheDir.absolutePath+"/zoteroKey.json"
+        var zoteroKey = loadZoteroKey(zoteroKeyFile,this)
+        var zoteroKeyString : String = Gson().toJson(zoteroKey)
+        var userID = zoteroKey.userID
+        var apiKey = zoteroKey.apiKey
+        if(!(zoteroKey.success)){
+            Toast.makeText(applicationContext,"No Zotero key found",Toast.LENGTH_LONG).show()
+            val intentAPI = Intent(this,apiKeyActivity::class.java)
+            startActivity(intentAPI)
+        }
+        Log.d("key",zoteroKeyString)
+        /////////////////////////////
         //
         var fileName = cacheDir.absolutePath+"/dates.json"
         //
@@ -55,6 +69,9 @@ class MainActivity : AppCompatActivity() {
                         // start paper list activity after pulling
                         val papers = parseArXivResponse(response)
                         intent.putExtra("Papers", paperListToJsonString(papers))
+                        Log.d("User ID before intent"," This is the user ID: $userID")
+                        intent.putExtra("UserID",userID)
+                        intent.putExtra("APIKey",apiKey)
                         startActivity(intent)
                     },
                     Response.ErrorListener {
@@ -65,7 +82,35 @@ class MainActivity : AppCompatActivity() {
         }
     }
 }
+//////////////////////////////////////
+class ZoteroKey{
+    var userID : String = ""
+    var apiKey : String = ""
+    var success: Boolean = false
+    constructor(): super(){}
+    constructor(UserID: String, APIKey: String, Success:Boolean): super() {
+        this.userID = UserID
+        this.apiKey = APIKey
+        this.success = Success
+    }
 
+}
+//////////////////////////////////////
+fun loadZoteroKey(fileName:String, context: Context) :ZoteroKey{
+    ////// Load key from file
+    var file = File(fileName)
+    var fileExist = file.exists()
+    var key : ZoteroKey = ZoteroKey("","",false)
+    if(fileExist){
+        var bufferedReader: BufferedReader = file.bufferedReader()
+        var inputString = bufferedReader.use{it.readText()}
+        key = Gson().fromJson(inputString, ZoteroKey::class.java)
+    }
+//    isZoteroKeyGood(key.apiKey,context)
+    return key
+}
+
+//////////////////////////////////////
 fun toNonNullString(str:String?):String{
     if(str==null){
         return "empty"

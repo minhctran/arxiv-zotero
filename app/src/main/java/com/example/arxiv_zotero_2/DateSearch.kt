@@ -44,7 +44,7 @@ fun updateDateList(fileName:String): ArrayList<MyDate>{
     var newDates : ArrayList<MyDate> = ArrayList()
 
     var lastDate = currentDateList[0].name
-    var daysAgo = nextDaysAgo(-1)
+    var daysAgo = nextDaysAgo(0)
     var currentDate = getCurrentDateTime(daysAgo,"EEEE MM/dd")
 
     // add new dates until meet lastDate

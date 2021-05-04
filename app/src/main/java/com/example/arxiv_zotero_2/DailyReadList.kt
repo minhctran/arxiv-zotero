@@ -24,6 +24,16 @@ class DailyReadList : AppCompatActivity() {
 
         ////////////////
         var paperList = jsonStringToPapers(intent.getStringExtra("Papers"))
+        var userID = intent.getStringExtra("UserID")
+        if(userID==null){
+            userID = ""
+        }
+        var apiKey = intent.getStringExtra("APIKey")
+        if (apiKey==null){
+            apiKey = ""
+        }
+        Log.d("API Key",apiKey)
+        Log.d("userID",userID)
         // test values
         var context = this
 //        var paperList = getPapers("test",context)
@@ -35,15 +45,16 @@ class DailyReadList : AppCompatActivity() {
             val selectedPaper = paperList[position]
 //            val dateIntent = DailyReadList.newIntent(context,selectedDate)
             Toast.makeText(applicationContext,"Saving \"${selectedPaper.title.substring(0,30)}...\" to Zotero",Toast.LENGTH_LONG).show()
-            addPaperToZotero(selectedPaper,context)
+            addPaperToZotero(selectedPaper,context,userID,apiKey)
         }
     }
 }
 
-fun addPaperToZotero(paper:Paper,context: Context){
-    val apiKey = "9d63speGZlvtpe9ySaIw7quk"
+fun addPaperToZotero(paper:Paper,context: Context,userID:String,apiKey:String){
+
     val queue = Volley.newRequestQueue(context)
-    val url = "https://api.zotero.org/users/3945720/items"
+    val url = "https://api.zotero.org/users/$userID/items"
+    Log.d("url",url)
     val stringRequest = object: StringRequest(Request.Method.POST, url,
         Response.Listener<String> { response ->
             Log.d("A", "Response is: " + response)
@@ -77,34 +88,34 @@ fun addPaperToZotero(paper:Paper,context: Context){
 //    paperJson.
 //}
 
-fun requestBlankPaper(paper:Paper,context: Context){
-    val apiKey = "9d63speGZlvtpe9ySaIw7quk"
-    val queue = Volley.newRequestQueue(context)
-    val url = "https://api.zotero.org/items/new?itemType=report"
-    val stringRequest = object: StringRequest(Request.Method.GET, url,
-        Response.Listener<String> { response ->
-            Log.d("A", "Response is: " + response)
-            val template = Gson().toJson(response)
-//            modifyTemplate(paper,context,template)
-        },
-        Response.ErrorListener {  })
-    {
-        override fun getHeaders(): MutableMap<String, String> {
-            val headers = HashMap<String, String>()
-            headers["Zotero-API-Key"] = apiKey
-            return headers
-        }
-//        override fun getBodyContentType(): String {
-//            return "application/json"
+//fun requestBlankPaper(paper:Paper,context: Context){
+//    val apiKey = "9d63speGZlvtpe9ySaIw7quk"
+//    val queue = Volley.newRequestQueue(context)
+//    val url = "https://api.zotero.org/items/new?itemType=report"
+//    val stringRequest = object: StringRequest(Request.Method.GET, url,
+//        Response.Listener<String> { response ->
+//            Log.d("A", "Response is: " + response)
+//            val template = Gson().toJson(response)
+////            modifyTemplate(paper,context,template)
+//        },
+//        Response.ErrorListener {  })
+//    {
+//        override fun getHeaders(): MutableMap<String, String> {
+//            val headers = HashMap<String, String>()
+//            headers["Zotero-API-Key"] = apiKey
+//            return headers
 //        }
-//        override fun getBody(): ByteArray {
-//            var jsonString:String = Gson().toJson(ZoteroPaper(Paper("title","abstract","author","url")))
-//            return jsonString.toByteArray()
-//        }
-    }
-
-    queue.add(stringRequest)
-}
+////        override fun getBodyContentType(): String {
+////            return "application/json"
+////        }
+////        override fun getBody(): ByteArray {
+////            var jsonString:String = Gson().toJson(ZoteroPaper(Paper("title","abstract","author","url")))
+////            return jsonString.toByteArray()
+////        }
+//    }
+//
+//    queue.add(stringRequest)
+//}
 
 class Tag{
     var tag : String? = null
@@ -124,9 +135,10 @@ class ZoteroPaper{
     var creators: ArrayList<Creator> = ArrayList()
     var abstractNote: String? = null
     var url: String? = null
+    var date: String? = null
     constructor(): super(){}
     constructor(Paper:Paper): super() {
-        this.itemType = "report"
+        this.itemType = "journalArticle"
         this.tags = arrayListOf(Tag())
         this.relations = JSONObject()
         this.collections = ArrayList()
@@ -138,6 +150,7 @@ class ZoteroPaper{
         }
         this.abstractNote = Paper.abstract
         this.url = Paper.url
+        this.date = getCurrentDateTime(0,"yyyy")
     }
 }
 
