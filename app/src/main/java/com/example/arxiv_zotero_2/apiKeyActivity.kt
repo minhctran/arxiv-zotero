@@ -20,7 +20,7 @@ class apiKeyActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_api_key)
-        val zoteroKeyFile = cacheDir.absolutePath+"/zoteroKey.json"
+        val zoteroKeyFile = filesDir.absolutePath+"/zoteroKey.json"
         var apiKeyview = findViewById<EditText>(R.id.zeroAPIKeyText) as EditText
         var submitButton = findViewById<Button>(R.id.submitButtonAPI) as Button
         var apiKey = ""
@@ -51,6 +51,7 @@ class apiKeyActivity : AppCompatActivity() {
                                     val writeAccess = userAccess.getString("write").toBoolean()
                                     if (libAccess&&fileAccess&&writeAccess){
                                         goodKey = true
+                                        Toast.makeText(applicationContext,"API key okay!",Toast.LENGTH_SHORT).show()
                                     }
                                 }
                             }

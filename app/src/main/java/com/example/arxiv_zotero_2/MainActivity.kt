@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         ///////////// Check if Zotero key is good. Otherwise need to get new API keys
-        var zoteroKeyFile = cacheDir.absolutePath+"/zoteroKey.json"
+        var zoteroKeyFile = filesDir.absolutePath+"/zoteroKey.json"
         var zoteroKey = loadZoteroKey(zoteroKeyFile,this)
         var zoteroKeyString : String = Gson().toJson(zoteroKey)
         var userID = zoteroKey.userID
@@ -39,13 +39,13 @@ class MainActivity : AppCompatActivity() {
         Log.d("key",zoteroKeyString)
         /////////////////////////////
         //
-        var fileName = cacheDir.absolutePath+"/dates.json"
+        var fileName = filesDir.absolutePath+"/dates.json"
         //
         var updatedDateList = updateDateList(fileName)
 
         //
         var listView = findViewById<ListView>(R.id.listview)
-        val adapter = DateAdapter(this, updatedDateList)
+        var adapter = DateAdapter(this, updatedDateList)
         listView.adapter = adapter
 
         // list papers on click
@@ -56,9 +56,7 @@ class MainActivity : AppCompatActivity() {
         listView.onItemClickListener = AdapterView.OnItemClickListener{ _, _, position, _ ->
             // get selected Date
             val selectedDate = updatedDateList[position].name
-            // set this date to "read"
-            updatedDateList[position].read=true
-            writeToJson(fileName,MyDates(updatedDateList))
+
             // pull the list of papers for the date
             Toast.makeText(applicationContext,"Pulling papers for "+selectedDate,Toast.LENGTH_LONG).show()
             val queue = Volley.newRequestQueue(this)
@@ -72,6 +70,11 @@ class MainActivity : AppCompatActivity() {
                         Log.d("User ID before intent"," This is the user ID: $userID")
                         intent.putExtra("UserID",userID)
                         intent.putExtra("APIKey",apiKey)
+                        // set this date to "read"
+                        updatedDateList[position].read=true
+                        adapter.notifyDataSetChanged()
+                        writeToJson(fileName,MyDates(updatedDateList))
+                        // start reading
                         startActivity(intent)
                     },
                     Response.ErrorListener {
@@ -218,7 +221,6 @@ fun writeToJson(fileName:String,myDates:MyDates){
 
 fun readFromJson(fileName:String):MyDates {
     var gson = Gson()
-    var fileName2 = fileName  + "a"
     var output = MyDates(arrayListOf(MyDate("You are up to date!",true)))
     var file = File(fileName)
     var fileExist = file.exists()
