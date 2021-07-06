@@ -82,40 +82,7 @@ fun addPaperToZotero(paper:Paper,context: Context,userID:String,apiKey:String){
 
     queue.add(stringRequest)
 }
-//
-//fun modifyTemplate(paper:Paper,context:Context,template:JSONObject){
-//    var paperJson = template
-//    paperJson.
-//}
 
-//fun requestBlankPaper(paper:Paper,context: Context){
-//    val apiKey = "9d63speGZlvtpe9ySaIw7quk"
-//    val queue = Volley.newRequestQueue(context)
-//    val url = "https://api.zotero.org/items/new?itemType=report"
-//    val stringRequest = object: StringRequest(Request.Method.GET, url,
-//        Response.Listener<String> { response ->
-//            Log.d("A", "Response is: " + response)
-//            val template = Gson().toJson(response)
-////            modifyTemplate(paper,context,template)
-//        },
-//        Response.ErrorListener {  })
-//    {
-//        override fun getHeaders(): MutableMap<String, String> {
-//            val headers = HashMap<String, String>()
-//            headers["Zotero-API-Key"] = apiKey
-//            return headers
-//        }
-////        override fun getBodyContentType(): String {
-////            return "application/json"
-////        }
-////        override fun getBody(): ByteArray {
-////            var jsonString:String = Gson().toJson(ZoteroPaper(Paper("title","abstract","author","url")))
-////            return jsonString.toByteArray()
-////        }
-//    }
-//
-//    queue.add(stringRequest)
-//}
 
 class Tag{
     var tag : String? = null

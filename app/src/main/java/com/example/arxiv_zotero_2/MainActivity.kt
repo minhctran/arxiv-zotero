@@ -125,7 +125,7 @@ fun toNonNullString(str:String?):String{
 
 //@RequiresApi(Build.VERSION_CODES.O)
 fun getArXivAddress(dateString:String):String{
-    val urlsample = "https://export.arxiv.org/api/query?search_query=submittedDate:[200901130630+TO+200901131645]&max_results=200"
+
 
     val year = getCurrentDateTime(0,"yyyy")
     val dayOfWeek = dateString.split(" ")[0]
